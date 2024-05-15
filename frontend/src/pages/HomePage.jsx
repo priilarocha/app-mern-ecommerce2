@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Grid } from "@mui/material";
+
 import NavBar from "../components/NavBar";
 import ProductCard from "../components/ProductCard";
 
@@ -9,6 +11,9 @@ axios.defaults.baseURL = baseURL;
 const HomePage = () => {
   const [productList, setProductList] = useState([]);
 
+  useEffect(() => {
+    getProduct();
+  }, []);
 
   const getProduct = async () => {
     try {
@@ -20,27 +25,22 @@ const HomePage = () => {
     }
   };
 
-  useEffect(() => {
-    getProduct();
-  }, []);
-
   return (
     <>
       <NavBar />
-      {/* Render a heading with the text "My HomePage" */}
-      <h1>My HomePage</h1>
-      {/* Check if productList is not empty */}
-      {productList.length !== 0 &&
-        // If productList is not empty, map over it and render a ProductCard component for each product
-        productList.map((product) => (
-          // Render a ProductCard component with a unique key and the product as a prop
-          <ProductCard
-            key={product._id}
-            product={product}
-            getProduct={() => getProduct()} />
-        ))}
+      <Grid container gap={3} sx={{ paddingTop: 2, paddingLeft: 3 }}>
+        {productList.length !== 0 &&
+          productList.map((product) => (
+            <Grid item key={product._id}>
+              <ProductCard
+                key={product._id}
+                product={product}
+                getProduct={() => getProduct()}
+              />
+            </Grid>
+          ))}
+      </Grid>
     </>
-    // End of the component's return statement
   );
 };
 

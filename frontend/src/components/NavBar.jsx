@@ -1,52 +1,99 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Badge from "@mui/material/Badge";
+import { IconButton } from "@mui/material";
+import { useSelector } from "react-redux";
+import logo from "../img/logo_2.png";
+import ButtonBase from "@mui/material/ButtonBase";
+import { AuthContext } from "../context/authContext";
 
 const NavBar = () => {
-  // Using the useNavigate hook from react-router-dom to get the navigate function
   const navigate = useNavigate();
+  const authContext = React.useContext(AuthContext);
+  const items = useSelector((state) => state.cartStore.addedItems);
+  const [token, setToken] = useState();
+  const [isAdmin, setIsAdmin] = useState();
 
-  // Function to navigate to the home page
+  useEffect(() => {
+    setToken(localStorage.getItem("token"));
+    setIsAdmin(localStorage.getItem("isAdmin"));
+  }, [token]);
+
   const goToHome = () => {
     navigate("/");
   };
 
-  // Function to navigate to the add product page
   const goToAddProduct = () => {
     navigate("/addProduct");
   };
 
-  // The component returns a Box containing an AppBar, which in turn contains a Toolbar.
-  // The Toolbar contains a Typography component for the title and two Button components for navigation.
+  const goToLogin = () => {
+    navigate("/login");
+  };
+
+  const logOut = () => {
+    localStorage.clear();
+    setIsAdmin();
+    setToken();
+    authContext.logout();
+    navigate("/");
+  };
+
+  const goToCart = () => {
+    navigate("/cart");
+  };
+
+  const goToOrders = () => {
+    navigate("/orders");
+  };
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
+        <AppBar position="static" sx={{ background: "#38B6FF" }}>
           <Toolbar>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{
-                flexGrow: 1,
-              }}
-            >
-              E-COM
-            </Typography>
-            <Button color="inherit" onClick={goToHome}>
-              Home
-            </Button>
-            <Button color="inherit" onClick={goToAddProduct}>
-              Add product
-            </Button>
+            <ButtonBase onClick={goToHome}>
+              <Box
+                component="img"
+                sx={{ width: "8rem", height: "5rem" }}
+                src={logo}
+              />
+            </ButtonBase>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} />
+            {token && (
+              <Button color="inherit" onClick={goToOrders}>
+                Orders
+              </Button>
+            )}
+            <IconButton onClick={goToCart}>
+              <Badge badgeContent={items.length} color="secondary">
+                <ShoppingCartIcon />
+              </Badge>
+            </IconButton>
+            {isAdmin && (
+              <Button color="inherit" onClick={goToAddProduct}>
+                Add product
+              </Button>
+            )}
+            {!token ? (
+              <Button color="inherit" onClick={goToLogin}>
+                Login
+              </Button>
+            ) : (
+              <Button color="inherit" onClick={logOut}>
+                LogOut
+              </Button>
+            )}
           </Toolbar>
         </AppBar>
       </Box>
     </>
   );
 };
-
 export default NavBar;
